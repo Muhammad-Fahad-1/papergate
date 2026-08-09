@@ -33,25 +33,27 @@ export default function CreateForm({
     onClose();
   }
 
-  const field = "w-full rounded-lg border border-slate-300 px-3 py-2 text-sm";
+  const field =
+    "w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100 dark:placeholder:text-slate-500";
+  const label = "text-sm font-medium text-slate-700 dark:text-slate-200";
 
   return (
     <div className="flex flex-col gap-3">
-      {error && <p className="text-sm text-red-600">{error}</p>}
+      {error && <p className="text-sm text-red-600 dark:text-red-400">{error}</p>}
       <div>
-        <label className="text-sm font-medium text-slate-700">Title</label>
+        <label className={label}>Title</label>
         <input className={field} value={title} onChange={(e) => setTitle(e.target.value)} />
       </div>
       <div>
-        <label className="text-sm font-medium text-slate-700">Authors</label>
+        <label className={label}>Authors</label>
         <input className={field} value={authors} onChange={(e) => setAuthors(e.target.value)} placeholder="A. Author, B. Author" />
       </div>
       <div>
-        <label className="text-sm font-medium text-slate-700">Abstract</label>
+        <label className={label}>Abstract</label>
         <textarea className={field} rows={4} value={abstract} onChange={(e) => setAbstract(e.target.value)} />
       </div>
       <div>
-        <label className="text-sm font-medium text-slate-700">Status</label>
+        <label className={label}>Status</label>
         <select className={field} value={status} onChange={(e) => setStatus(e.target.value as SubmissionStatus)}>
           <option value="Draft">Draft</option>
           <option value="Under Review">Under Review</option>
@@ -60,10 +62,10 @@ export default function CreateForm({
         </select>
       </div>
       <div className="mt-2 flex justify-end gap-2">
-        <button onClick={onClose} className="rounded-lg px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100">
+        <button onClick={onClose} className="rounded-lg px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-700">
           Cancel
         </button>
-        <button onClick={submit} className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800">
+        <button onClick={submit} className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-white">
           Create
         </button>
       </div>

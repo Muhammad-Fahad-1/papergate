@@ -118,41 +118,43 @@ export default function DashboardPage() {
 
   return (
     <div>
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold">Dashboard</h1>
-          <p className="mt-1 text-sm text-slate-500">Overview of academic submissions.</p>
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">Dashboard</h1>
+          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Overview of academic submissions.</p>
         </div>
         <button
           onClick={() => setCreating(true)}
-          className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800"
+          className="w-full rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800 sm:w-auto dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-white"
         >
           New Submission
         </button>
       </div>
 
-      <div className="mt-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
+      <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {statCards.map((c) => (
-          <div key={c.label} className="rounded-xl border border-slate-200 bg-white p-4">
-            <div className="text-sm text-slate-500">{c.label}</div>
-            <div className="mt-1 text-3xl font-bold">{c.value}</div>
+          <div key={c.label} className="rounded-xl border border-slate-200 bg-white p-4 dark:border-slate-700 dark:bg-slate-800">
+            <div className="text-sm text-slate-500 dark:text-slate-400">{c.label}</div>
+            <div className="mt-1 text-3xl font-bold text-slate-900 dark:text-slate-100">{c.value}</div>
           </div>
         ))}
       </div>
+
       <div className="mt-6">
         <StatusChart data={data} />
       </div>
+
       <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center">
         <input
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search by title or author..."
-          className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm sm:max-w-xs"
+          className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500 sm:max-w-xs"
         />
         <select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value as "All" | SubmissionStatus)}
-          className="rounded-lg border border-slate-300 px-3 py-2 text-sm"
+          className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 sm:w-auto"
         >
           <option value="All">All statuses</option>
           <option value="Draft">Draft</option>
@@ -162,9 +164,9 @@ export default function DashboardPage() {
         </select>
       </div>
 
-      <div className="mt-4 overflow-x-auto rounded-xl border border-slate-200 bg-white">
-        <table className="w-full text-left text-sm">
-          <thead className="border-b border-slate-200 bg-slate-50 text-slate-600">
+      <div className="mt-4 overflow-x-auto rounded-xl border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-800">
+        <table className="w-full min-w-[640px] text-left text-sm">
+          <thead className="border-b border-slate-200 bg-slate-50 text-slate-600 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300">
             <tr>
               <Th label="Title" onClick={() => toggleSort("title")} />
               <Th label="Authors" onClick={() => toggleSort("authors")} />
@@ -182,11 +184,11 @@ export default function DashboardPage() {
                 <tr
                   key={s.id}
                   onClick={() => openDetail(s)}
-                  className="cursor-pointer border-b border-slate-100 last:border-0 hover:bg-slate-50"
+                  className="cursor-pointer border-b border-slate-100 last:border-0 hover:bg-slate-50 dark:border-slate-700 dark:hover:bg-slate-700/50"
                 >
-                  <td className="px-4 py-3 font-medium text-slate-800">{s.title}</td>
-                  <td className="px-4 py-3 text-slate-600">{s.authors}</td>
-                  <td className="px-4 py-3 text-slate-600">
+                  <td className="px-4 py-3 font-medium text-slate-800 dark:text-slate-100">{s.title}</td>
+                  <td className="px-4 py-3 text-slate-600 dark:text-slate-300">{s.authors}</td>
+                  <td className="px-4 py-3 text-slate-600 dark:text-slate-300">
                     {new Date(s.submittedAt).toLocaleDateString()}
                   </td>
                   <td className="px-4 py-3">
@@ -203,18 +205,18 @@ export default function DashboardPage() {
 
       <Modal open={!!selected} onClose={() => setSelected(null)} title={selected?.title ?? ""}>
         {selected && (
-          <div className="flex flex-col gap-3 text-sm">
+          <div className="flex flex-col gap-3 text-sm text-slate-700 dark:text-slate-200">
             <div>
-              <span className="font-medium text-slate-700">ID: </span>
-              <span className="text-slate-600">{selected.id}</span>
+              <span className="font-medium text-slate-700 dark:text-slate-200">ID: </span>
+              <span className="text-slate-600 dark:text-slate-300">{selected.id}</span>
             </div>
             <div>
-              <span className="font-medium text-slate-700">Authors: </span>
-              <span className="text-slate-600">{selected.authors}</span>
+              <span className="font-medium text-slate-700 dark:text-slate-200">Authors: </span>
+              <span className="text-slate-600 dark:text-slate-300">{selected.authors}</span>
             </div>
             <div>
-              <span className="font-medium text-slate-700">Submitted: </span>
-              <span className="text-slate-600">{new Date(selected.submittedAt).toLocaleString()}</span>
+              <span className="font-medium text-slate-700 dark:text-slate-200">Submitted: </span>
+              <span className="text-slate-600 dark:text-slate-300">{new Date(selected.submittedAt).toLocaleString()}</span>
             </div>
             <div>
               <span className={`inline-block rounded-full px-2.5 py-1 text-xs font-medium ${statusStyles[selected.status]}`}>
@@ -222,11 +224,11 @@ export default function DashboardPage() {
               </span>
             </div>
             <div>
-              <div className="font-medium text-slate-700">Abstract</div>
-              <p className="mt-1 leading-relaxed text-slate-600">{selected.abstract}</p>
+              <div className="font-medium text-slate-700 dark:text-slate-200">Abstract</div>
+              <p className="mt-1 leading-relaxed text-slate-600 dark:text-slate-300">{selected.abstract}</p>
             </div>
 
-            <div className="mt-2 border-t border-slate-100 pt-3">
+            <div className="mt-2 border-t border-slate-100 pt-3 dark:border-slate-700">
               <button
                 onClick={runIntegrityCheck}
                 disabled={checking}
@@ -236,10 +238,10 @@ export default function DashboardPage() {
               </button>
 
               {report && (
-                <div className="mt-4 rounded-lg border border-slate-200 bg-slate-50 p-4">
+                <div className="mt-4 rounded-lg border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-900">
                   <div className="flex items-center justify-between">
-                    <span className="font-medium text-slate-700">Integrity Report</span>
-                    <span className="text-sm text-slate-500">
+                    <span className="font-medium text-slate-700 dark:text-slate-200">Integrity Report</span>
+                    <span className="text-sm text-slate-500 dark:text-slate-400">
                       Originality {report.originalityScore}/100 · {report.readability}
                     </span>
                   </div>
@@ -249,9 +251,9 @@ export default function DashboardPage() {
                         <span className={c.passed ? "text-green-600" : "text-red-500"}>
                           {c.passed ? "✓" : "✗"}
                         </span>
-                        <span className="text-slate-700">
+                        <span className="text-slate-700 dark:text-slate-200">
                           <span className="font-medium">{c.label}.</span>{" "}
-                          <span className="text-slate-500">{c.note}</span>
+                          <span className="text-slate-500 dark:text-slate-400">{c.note}</span>
                         </span>
                       </li>
                     ))}
@@ -263,7 +265,7 @@ export default function DashboardPage() {
               )}
             </div>
 
-            <div className="mt-1 border-t border-slate-100 pt-3">
+            <div className="mt-1 border-t border-slate-100 pt-3 dark:border-slate-700">
               <div className="flex flex-wrap gap-2">
                 <button
                   onClick={handleSeal}
@@ -274,7 +276,7 @@ export default function DashboardPage() {
                 {sealInfo && (
                   <button
                     onClick={handleVerify}
-                    className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100"
+                    className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-700"
                   >
                     Verify Seal
                   </button>
@@ -282,14 +284,14 @@ export default function DashboardPage() {
               </div>
 
               {sealInfo && (
-                <div className="mt-3 rounded-lg border border-emerald-200 bg-emerald-50 p-4">
-                  <div className="text-xs font-medium text-emerald-800">SHA-256 Seal</div>
-                  <div className="mt-1 break-all font-mono text-xs text-slate-700">{sealInfo.hash}</div>
-                  <div className="mt-2 text-xs text-slate-500">
+                <div className="mt-3 rounded-lg border border-emerald-200 bg-emerald-50 p-4 dark:border-emerald-800 dark:bg-emerald-950">
+                  <div className="text-xs font-medium text-emerald-800 dark:text-emerald-300">SHA-256 Seal</div>
+                  <div className="mt-1 break-all font-mono text-xs text-slate-700 dark:text-slate-300">{sealInfo.hash}</div>
+                  <div className="mt-2 text-xs text-slate-500 dark:text-slate-400">
                     Sealed at {new Date(sealInfo.sealedAt).toLocaleString()}
                   </div>
                   {verifyResult !== null && (
-                    <div className={`mt-2 text-xs font-medium ${verifyResult ? "text-green-700" : "text-red-600"}`}>
+                    <div className={`mt-2 text-xs font-medium ${verifyResult ? "text-green-700 dark:text-green-400" : "text-red-600 dark:text-red-400"}`}>
                       {verifyResult
                         ? "✓ Verified: content matches the seal."
                         : "✗ Mismatch: content has changed since sealing."}
@@ -313,9 +315,9 @@ function Th({ label, onClick }: { label: string; onClick: () => void }) {
   return (
     <th
       onClick={onClick}
-      className="cursor-pointer select-none px-4 py-3 font-semibold hover:text-slate-900"
+      className="cursor-pointer select-none px-4 py-3 font-semibold hover:text-slate-900 dark:hover:text-slate-100"
     >
-      {label} <span className="text-slate-300">↕</span>
+      {label} <span className="text-slate-300 dark:text-slate-600">↕</span>
     </th>
   );
 }
