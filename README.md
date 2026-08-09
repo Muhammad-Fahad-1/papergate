@@ -1,36 +1,38 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# PaperGate
 
-## Getting Started
+A demo academic pre-submission dashboard, inspired by the workflow of tools like ScholarMark. Built with Next.js, React, and Tailwind CSS.
 
-First, run the development server:
+## Live Demo
+
+[View live](https://YOUR-VERCEL-URL.vercel.app)
+
+## What it does
+
+- **Submissions dashboard** with stat cards, a searchable and sortable table, and status filtering
+- **Detail view** for each submission with full abstract and metadata
+- **Create submission** form with validation
+- **Integrity check**: a rule-based analysis of the abstract (length, methodology, results, readability) served from a Next.js API route
+- **Cryptographic seal**: a SHA-256 hash of the abstract with verification, using the Web Crypto API
+- **Bar chart** of submissions by status
+- **Dark mode** toggle and a fully responsive layout
+
+## Tech stack
+
+- Next.js (App Router) and React
+- TypeScript
+- Tailwind CSS
+- Recharts for the chart
+- Next.js API routes for the backend (mock data and the integrity endpoint)
+
+## Running locally
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open http://localhost:3000.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Notes
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Submission data is served from an in-memory mock via a Next.js API route. New submissions and seals are held in client state for the session and reset on refresh. The integrity check uses transparent rule-based heuristics, not a machine learning model. This is a portfolio project and is not affiliated with any organization.
