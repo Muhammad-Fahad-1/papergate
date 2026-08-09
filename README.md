@@ -6,6 +6,10 @@ A demo academic pre-submission dashboard, inspired by the workflow of tools like
 
 [View live](https://YOUR-VERCEL-URL.vercel.app)
 
+[View live](https://papergate.vercel.app)
+
+![PaperGate dashboard](./screenshot.png)
+
 ## What it does
 
 - **Submissions dashboard** with stat cards, a searchable and sortable table, and status filtering
