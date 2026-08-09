@@ -2,6 +2,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Submission, SubmissionStatus } from "@/lib/types";
 import { statusStyles } from "@/lib/status";
+import { sealDocument, verifyDocument } from "@/lib/crypto";
 import Modal from "@/components/Modal";
 import CreateForm from "@/components/CreateForm";
 
@@ -24,6 +25,8 @@ export default function DashboardPage() {
   const [creating, setCreating] = useState(false);
   const [report, setReport] = useState<IntegrityReport | null>(null);
   const [checking, setChecking] = useState(false);
+  const [sealInfo, setSealInfo] = useState<{ hash: string; sealedAt: string } | null>(null);
+  const [verifyResult, setVerifyResult] = useState<null | boolean>(null);
 
   useEffect(() => {
     fetch("/api/submissions")
@@ -36,6 +39,8 @@ export default function DashboardPage() {
   function openDetail(s: Submission) {
     setSelected(s);
     setReport(null);
+    setSealInfo(null);
+    setVerifyResult(null);
   }
 
   async function runIntegrityCheck() {
@@ -55,6 +60,19 @@ export default function DashboardPage() {
     } finally {
       setChecking(false);
     }
+  }
+
+  async function handleSeal() {
+    if (!selected) return;
+    const info = await sealDocument(selected.abstract);
+    setSealInfo(info);
+    setVerifyResult(null);
+  }
+
+  async function handleVerify() {
+    if (!selected || !sealInfo) return;
+    const ok = await verifyDocument(selected.abstract, sealInfo.hash);
+    setVerifyResult(ok);
   }
 
   function handleCreate(s: Submission) {
@@ -238,6 +256,42 @@ export default function DashboardPage() {
                   <p className="mt-3 text-xs text-slate-400">
                     Rule-based integrity heuristics. Not a substitute for full peer review.
                   </p>
+                </div>
+              )}
+            </div>
+
+            <div className="mt-1 border-t border-slate-100 pt-3">
+              <div className="flex flex-wrap gap-2">
+                <button
+                  onClick={handleSeal}
+                  className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700"
+                >
+                  Seal Document
+                </button>
+                {sealInfo && (
+                  <button
+                    onClick={handleVerify}
+                    className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100"
+                  >
+                    Verify Seal
+                  </button>
+                )}
+              </div>
+
+              {sealInfo && (
+                <div className="mt-3 rounded-lg border border-emerald-200 bg-emerald-50 p-4">
+                  <div className="text-xs font-medium text-emerald-800">SHA-256 Seal</div>
+                  <div className="mt-1 break-all font-mono text-xs text-slate-700">{sealInfo.hash}</div>
+                  <div className="mt-2 text-xs text-slate-500">
+                    Sealed at {new Date(sealInfo.sealedAt).toLocaleString()}
+                  </div>
+                  {verifyResult !== null && (
+                    <div className={`mt-2 text-xs font-medium ${verifyResult ? "text-green-700" : "text-red-600"}`}>
+                      {verifyResult
+                        ? "✓ Verified: content matches the seal."
+                        : "✗ Mismatch: content has changed since sealing."}
+                    </div>
+                  )}
                 </div>
               )}
             </div>
