@@ -2,6 +2,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { Submission, SubmissionStatus } from "@/lib/types";
 import { statusStyles } from "@/lib/status";
+import Modal from "@/components/Modal";
+import CreateForm from "@/components/CreateForm";
 
 type SortKey = "title" | "authors" | "submittedAt" | "status";
 
@@ -12,6 +14,8 @@ export default function DashboardPage() {
   const [statusFilter, setStatusFilter] = useState<"All" | SubmissionStatus>("All");
   const [sortKey, setSortKey] = useState<SortKey>("submittedAt");
   const [sortAsc, setSortAsc] = useState(false);
+  const [selected, setSelected] = useState<Submission | null>(null);
+  const [creating, setCreating] = useState(false);
 
   useEffect(() => {
     fetch("/api/submissions")
@@ -21,14 +25,16 @@ export default function DashboardPage() {
       .finally(() => setLoading(false));
   }, []);
 
-  const stats = useMemo(() => {
-    return {
-      total: data.length,
-      review: data.filter((d) => d.status === "Under Review").length,
-      cleared: data.filter((d) => d.status === "Cleared").length,
-      rejected: data.filter((d) => d.status === "Rejected").length,
-    };
-  }, [data]);
+  function handleCreate(s: Submission) {
+    setData((prev) => [s, ...prev]);
+  }
+
+  const stats = useMemo(() => ({
+    total: data.length,
+    review: data.filter((d) => d.status === "Under Review").length,
+    cleared: data.filter((d) => d.status === "Cleared").length,
+    rejected: data.filter((d) => d.status === "Rejected").length,
+  }), [data]);
 
   const filtered = useMemo(() => {
     let rows = data;
@@ -49,10 +55,7 @@ export default function DashboardPage() {
 
   function toggleSort(key: SortKey) {
     if (key === sortKey) setSortAsc((v) => !v);
-    else {
-      setSortKey(key);
-      setSortAsc(true);
-    }
+    else { setSortKey(key); setSortAsc(true); }
   }
 
   const statCards = [
@@ -64,8 +67,18 @@ export default function DashboardPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold">Dashboard</h1>
-      <p className="mt-1 text-sm text-slate-500">Overview of academic submissions.</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold">Dashboard</h1>
+          <p className="mt-1 text-sm text-slate-500">Overview of academic submissions.</p>
+        </div>
+        <button
+          onClick={() => setCreating(true)}
+          className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800"
+        >
+          New Submission
+        </button>
+      </div>
 
       <div className="mt-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
         {statCards.map((c) => (
@@ -113,7 +126,11 @@ export default function DashboardPage() {
               <tr><td colSpan={4} className="p-6 text-center text-slate-400">No submissions match.</td></tr>
             ) : (
               filtered.map((s) => (
-                <tr key={s.id} className="border-b border-slate-100 last:border-0 hover:bg-slate-50">
+                <tr
+                  key={s.id}
+                  onClick={() => setSelected(s)}
+                  className="cursor-pointer border-b border-slate-100 last:border-0 hover:bg-slate-50"
+                >
                   <td className="px-4 py-3 font-medium text-slate-800">{s.title}</td>
                   <td className="px-4 py-3 text-slate-600">{s.authors}</td>
                   <td className="px-4 py-3 text-slate-600">
@@ -130,6 +147,38 @@ export default function DashboardPage() {
           </tbody>
         </table>
       </div>
+
+      <Modal open={!!selected} onClose={() => setSelected(null)} title={selected?.title ?? ""}>
+        {selected && (
+          <div className="flex flex-col gap-3 text-sm">
+            <div>
+              <span className="font-medium text-slate-700">ID: </span>
+              <span className="text-slate-600">{selected.id}</span>
+            </div>
+            <div>
+              <span className="font-medium text-slate-700">Authors: </span>
+              <span className="text-slate-600">{selected.authors}</span>
+            </div>
+            <div>
+              <span className="font-medium text-slate-700">Submitted: </span>
+              <span className="text-slate-600">{new Date(selected.submittedAt).toLocaleString()}</span>
+            </div>
+            <div>
+              <span className={`inline-block rounded-full px-2.5 py-1 text-xs font-medium ${statusStyles[selected.status]}`}>
+                {selected.status}
+              </span>
+            </div>
+            <div>
+              <div className="font-medium text-slate-700">Abstract</div>
+              <p className="mt-1 leading-relaxed text-slate-600">{selected.abstract}</p>
+            </div>
+          </div>
+        )}
+      </Modal>
+
+      <Modal open={creating} onClose={() => setCreating(false)} title="New Submission">
+        <CreateForm onCreate={handleCreate} onClose={() => setCreating(false)} />
+      </Modal>
     </div>
   );
 }
