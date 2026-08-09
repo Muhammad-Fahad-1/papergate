@@ -7,6 +7,12 @@ import CreateForm from "@/components/CreateForm";
 
 type SortKey = "title" | "authors" | "submittedAt" | "status";
 
+interface IntegrityReport {
+  originalityScore: number;
+  readability: string;
+  checks: { label: string; passed: boolean; note: string }[];
+}
+
 export default function DashboardPage() {
   const [data, setData] = useState<Submission[]>([]);
   const [loading, setLoading] = useState(true);
@@ -16,6 +22,8 @@ export default function DashboardPage() {
   const [sortAsc, setSortAsc] = useState(false);
   const [selected, setSelected] = useState<Submission | null>(null);
   const [creating, setCreating] = useState(false);
+  const [report, setReport] = useState<IntegrityReport | null>(null);
+  const [checking, setChecking] = useState(false);
 
   useEffect(() => {
     fetch("/api/submissions")
@@ -24,6 +32,30 @@ export default function DashboardPage() {
       .catch(() => setData([]))
       .finally(() => setLoading(false));
   }, []);
+
+  function openDetail(s: Submission) {
+    setSelected(s);
+    setReport(null);
+  }
+
+  async function runIntegrityCheck() {
+    if (!selected) return;
+    setChecking(true);
+    setReport(null);
+    try {
+      const res = await fetch("/api/integrity", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ abstract: selected.abstract }),
+      });
+      const data = await res.json();
+      setReport(data);
+    } catch {
+      setReport(null);
+    } finally {
+      setChecking(false);
+    }
+  }
 
   function handleCreate(s: Submission) {
     setData((prev) => [s, ...prev]);
@@ -128,7 +160,7 @@ export default function DashboardPage() {
               filtered.map((s) => (
                 <tr
                   key={s.id}
-                  onClick={() => setSelected(s)}
+                  onClick={() => openDetail(s)}
                   className="cursor-pointer border-b border-slate-100 last:border-0 hover:bg-slate-50"
                 >
                   <td className="px-4 py-3 font-medium text-slate-800">{s.title}</td>
@@ -171,6 +203,43 @@ export default function DashboardPage() {
             <div>
               <div className="font-medium text-slate-700">Abstract</div>
               <p className="mt-1 leading-relaxed text-slate-600">{selected.abstract}</p>
+            </div>
+
+            <div className="mt-2 border-t border-slate-100 pt-3">
+              <button
+                onClick={runIntegrityCheck}
+                disabled={checking}
+                className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 disabled:opacity-60"
+              >
+                {checking ? "Checking..." : "Run Integrity Check"}
+              </button>
+
+              {report && (
+                <div className="mt-4 rounded-lg border border-slate-200 bg-slate-50 p-4">
+                  <div className="flex items-center justify-between">
+                    <span className="font-medium text-slate-700">Integrity Report</span>
+                    <span className="text-sm text-slate-500">
+                      Originality {report.originalityScore}/100 · {report.readability}
+                    </span>
+                  </div>
+                  <ul className="mt-3 flex flex-col gap-2">
+                    {report.checks.map((c) => (
+                      <li key={c.label} className="flex items-start gap-2">
+                        <span className={c.passed ? "text-green-600" : "text-red-500"}>
+                          {c.passed ? "✓" : "✗"}
+                        </span>
+                        <span className="text-slate-700">
+                          <span className="font-medium">{c.label}.</span>{" "}
+                          <span className="text-slate-500">{c.note}</span>
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                  <p className="mt-3 text-xs text-slate-400">
+                    Rule-based integrity heuristics. Not a substitute for full peer review.
+                  </p>
+                </div>
+              )}
             </div>
           </div>
         )}
