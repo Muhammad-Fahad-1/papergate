@@ -5,6 +5,7 @@ import { statusStyles } from "@/lib/status";
 import { sealDocument, verifyDocument } from "@/lib/crypto";
 import Modal from "@/components/Modal";
 import CreateForm from "@/components/CreateForm";
+import StatusChart from "@/components/StatusChart";
 
 type SortKey = "title" | "authors" | "submittedAt" | "status";
 
@@ -138,7 +139,9 @@ export default function DashboardPage() {
           </div>
         ))}
       </div>
-
+      <div className="mt-6">
+        <StatusChart data={data} />
+      </div>
       <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center">
         <input
           value={search}
